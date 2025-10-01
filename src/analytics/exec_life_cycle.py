@@ -10,8 +10,6 @@ def import_query(path: str) -> str:
 
 query = import_query('life-cycle.sql')
 
-# print(query.format(date='2025-08-01'))
-
 engine_app = sqlalchemy.create_engine('sqlite:///../../data/loyalty-system/database.db')
 
 engine_analytical = sqlalchemy.create_engine('sqlite:///../../data/analytics/database.db')
@@ -38,11 +36,11 @@ dates = [
 ]
 
 for i in dates:
-    
+  
     with engine_analytical.connect() as con:
         con.execute(sqlalchemy.text(f"DELETE FROM life_cycle WHERE DtRef = date('{i}', '-1 day')"))
         con.commit()
-    
+
     query_format = query.format(date=i)
     df = pd.read_sql(query_format, engine_app)
     df.to_sql('life_cycle', engine_analytical, if_exists='append', index=False)
