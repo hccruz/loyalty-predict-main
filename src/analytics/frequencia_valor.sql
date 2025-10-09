@@ -18,13 +18,13 @@ ORDER BY DiasComFrequencia DESC
 tb_cluster AS(
 SELECT *,
         CASE
-            WHEN DiasComFrequencia <= 10 AND TotalPontos >= 1500 THEN 'HYPERS'
-            WHEN DiasComFrequencia > 10 AND TotalPontos >= 1500 THEN 'EFICIENTES'
-            WHEN DiasComFrequencia <= 10 AND TotalPontos >= 1500 THEN 'INDECISOS'
-            WHEN DiasComFrequencia > 10 AND TotalPontos >= 750 THEN 'ESFORÇADOS'
-            WHEN DiasComFrequencia < 5 THEN 'LURKERS'
-            WHEN DiasComFrequencia <= 10 THEN 'PREGUIÇOSOS'
-            WHEN DiasComFrequencia > 10 THEN 'POTENCIAIS'
+            WHEN DiasComFrequencia <= 10 AND TotalPontos >= 1500 THEN '12-HYPERS'
+            WHEN DiasComFrequencia > 10 AND TotalPontos >= 1500 THEN '22-EFICIENTES'
+            WHEN DiasComFrequencia <= 10 AND TotalPontos >= 1500 THEN '11-INDECISOS'
+            WHEN DiasComFrequencia > 10 AND TotalPontos >= 750 THEN '21-ESFORÇADOS'
+            WHEN DiasComFrequencia < 5 THEN '00-LURKERS'
+            WHEN DiasComFrequencia <= 10 THEN '01-PREGUIÇOSOS'
+            WHEN DiasComFrequencia > 10 THEN '20-POTENCIAIS'
         END AS CLUSTER
 
 FROM tb_feq_valor
