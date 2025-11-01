@@ -39,7 +39,7 @@ def exec_query(table, db_origin, db_target, dt_start, dt_stop, monthly):
                 con.execute(sqlalchemy.text(query_delete))
                 con.commit()
             except Exception as err:
-                print(f"Error: {err}")
+                print(err)
 
         query_format = query.format(date=i)
         df = pd.read_sql(query_format, engine_app)

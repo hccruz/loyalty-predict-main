@@ -68,4 +68,7 @@ tb_join AS(
 )
 
 
-SELECT * FROM tb_join
+SELECT date('{date}', '-1 day') AS DtRef,
+       * 
+
+FROM tb_join
