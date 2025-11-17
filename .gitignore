@@ -1,2 +1,6 @@
 *.csv
 *.db
+mlartifacts/
+mlruns/
+*.pkl
+*.docx
