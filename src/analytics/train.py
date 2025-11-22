@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from sklearn import tree
 from sklearn import ensemble
-from sklearn.model_selection import train_test_split
+from sklearn import model_selection
 from sklearn import pipeline
 
 from feature_engine.selection import DropFeatures
@@ -49,7 +49,7 @@ df_train_test = df[df['DtRef'] < df['DtRef'].max()].reset_index(drop=True)
 X = df_train_test[features]  # Isso é um pd.DataFrame (Matriz)
 y = df_train_test[target]  # Isso é um pd.Series (Vetor)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y,
+X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y,
                                                     test_size=0.2,
                                                     random_state=42,
                                                     stratify=y)
@@ -116,7 +116,7 @@ input_1000 = ArbitraryNumberImputer(arbitrary_number=1000,
 
 onehot = OneHotEncoder(variables=cat_features)
 
-# MODEL
+# MODEL - ALGORITMO DE ML
 
 # model = tree.DecisionTreeClassifier(random_state=42, min_samples_leaf=50)  
 # model = ensemble.AdaBoostClassifier(random_state=42,
@@ -124,8 +124,20 @@ onehot = OneHotEncoder(variables=cat_features)
 #                                     learning_rate=0.1)
 model = ensemble.RandomForestClassifier(random_state=42,
                                         n_estimators=400,
-                                        min_samples_leaf=50)
+                                        min_samples_leaf=50,
+                                        n_jobs=2)
+params = {
+    "n_estimators": [100, 200, 400, 500, 1000],
+    "min_samples_leaf": [10, 20, 30, 50, 75, 100]
+}
 
+grid = model_selection.GridSearchCV(model,
+                                    param_grid=params,
+                                    scoring='roc_auc',
+                                    cv=3,
+                                    refit=True,
+                                    verbose=3,
+                                    n_jobs=4)
 # CRIANDO PIPELINE
 
 with mlflow.start_run() as r:
@@ -138,9 +150,9 @@ with mlflow.start_run() as r:
         ('Imputacao Nao_Usuario', input_new),
         ('Imputacao 1000', input_1000),
         ('OneHot Encoding', onehot),
-        ('Modelo de ML', model),
+        ('Algoritmo', grid),
     ])
-
+        
     model_pipeline.fit(X_train, y_train)
     
     # ASSESS - Métricas de Desempenho
@@ -212,7 +224,8 @@ with mlflow.start_run() as r:
 features_names = (model_pipeline[:-1].transform(X_train.head(-1))
                                     .columns.tolist())
 
-features_importances = pd.Series(model.feature_importances_,
+features_importance = pd.Series(model_pipeline[-1].feature_importances_,
                                  index=features_names)
 
-features_importances.sort_values(ascending=False)
+features_importance.sort_values(ascending=False)
+# %%
