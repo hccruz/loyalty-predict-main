@@ -32,5 +32,7 @@ run:
 	cd ../analytics && \
 	python pipeline_analytics.py
 
+# Alvo padrão
+.PHONY: all
 all: setup run
 	@echo 'Processo concluído.'
