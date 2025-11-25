@@ -25,7 +25,7 @@ def date_range(start: str, stop: str, monthly: bool = False) -> list:
     return dates
 
 
-def exec_query(table, db_origin, db_target, dt_start, dt_stop, monthly):
+def exec_query(table, db_origin, db_target, dt_start, dt_stop, monthly, mode='append'):
     engine_app = sqlalchemy.create_engine(f'sqlite:///../../data/{db_origin}/database.db')
     engine_analytical = sqlalchemy.create_engine(f'sqlite:///../../data/{db_target}/database.db')
     query = import_query(f'{table}.sql')
@@ -33,17 +33,18 @@ def exec_query(table, db_origin, db_target, dt_start, dt_stop, monthly):
 
     for i in tqdm(dates):
     
-        with engine_analytical.connect() as con:
-            try:
-                query_delete = f"DELETE FROM {table} WHERE DtRef = date('{i}', '-1 day')"
-                con.execute(sqlalchemy.text(query_delete))
-                con.commit()
-            except Exception as err:
-                print(err)
+        if mode == 'append':
+            with engine_analytical.connect() as con:
+                try:
+                    query_delete = f"DELETE FROM {table} WHERE DtRef = date('{i}', '-1 day')"
+                    con.execute(sqlalchemy.text(query_delete))
+                    con.commit()
+                except Exception as err:
+                    print(err)
 
         query_format = query.format(date=i)
         df = pd.read_sql(query_format, engine_app)
-        df.to_sql(table, engine_analytical, if_exists='append', index=False)
+        df.to_sql(table, engine_analytical, if_exists=mode, index=False)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -55,6 +56,7 @@ def main():
     parser.add_argument('--start', type=str, default=now)
     parser.add_argument('--stop', type=str, default=now)
     parser.add_argument('--monthly', action='store_true', help='Processar apenas o primeiro dia de cada mês.')
+    parser.add_argument('--mode', choices=['append', 'replace'], help='Modo de inserção na tabela de destino.')
     args = parser.parse_args()
     
     exec_query(args.table, args.db_origin, args.db_target, args.start, args.stop, args.monthly)

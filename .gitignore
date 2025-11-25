@@ -1,6 +1,14 @@
+# env files
+kaggle.json
+.env
+.venv
+
+# data files
 *.csv
 *.db
-mlartifacts/
-mlruns/
 *.pkl
 *.docx
+# cache e artefatos de experimentos
+__pycache__/
+mlartifacts/
+mlruns/
